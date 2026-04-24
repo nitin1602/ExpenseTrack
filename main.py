@@ -102,6 +102,17 @@ def add_expense():
     db.session.commit()
     return redirect('/')
 
+@app.route('/add_category', methods=['POST'])
+def add_category():
+    name = request.form['name']
+
+    if name:  # avoid empty
+        c = Category(name=name)
+        db.session.add(c)
+        db.session.commit()
+
+    return redirect('/')
+
 # 🔥 IMPORTANT: Filter subcategories by category (AJAX endpoint)
 @app.route('/api/subcategories/<int:category_id>')
 def get_subcategories(category_id):
