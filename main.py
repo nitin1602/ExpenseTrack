@@ -35,7 +35,14 @@ import os
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///expenses.db')
+uri = os.getenv("DATABASE_URL")
+
+if uri and uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = uri or "sqlite:///expenses.db"
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///expenses.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -105,18 +112,22 @@ def add_expense():
 @app.route('/add_category', methods=['POST'])
 def add_category():
     name = request.form['name']
+    try:
+        if name:
+            existing = Category.query.filter_by(name=name).first()
 
-    if name:  # avoid empty
-        c = Category(name=name)
-        db.session.add(c)
-        db.session.commit()
+            if not existing:
+                db.session.add(Category(name=name))
+                db.session.commit()
 
-    return redirect('/')
+        return redirect('/')
+    except:
+        return str(e)
 
 @app.route('/add_subcategory', methods=['POST'])
 def add_subcategory():
     name = request.form['name']
-    category_id = request.form['category_id']
+    category_id = int(request.form['category_id'])
 
     if name and category_id:
         s = SubCategory(name=name, category_id=category_id)
@@ -127,11 +138,12 @@ def add_subcategory():
 @app.route('/add_person', methods=['POST'])
 def add_person():
     name = request.form['name']
-    person_id = request.form['person_id']
+
     if name:
-        p = Person(name=name, person_id=person_id)
+        p = Person(name=name)   # ✅ correct
         db.session.add(p)
         db.session.commit()
+
     return redirect('/')
 
 # 🔥 IMPORTANT: Filter subcategories by category (AJAX endpoint)
