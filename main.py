@@ -39,8 +39,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///exp
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-with app.app_context():
-    db.create_all()
+
 
 # =========================
 # MODELS
@@ -67,6 +66,8 @@ class Expense(db.Model):
     payment_mode = db.Column(db.String(50))
     date = db.Column(db.String(20))
 
+with app.app_context():
+    db.create_all()
 # =========================
 # ROUTES (UI)
 # =========================
