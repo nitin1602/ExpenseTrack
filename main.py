@@ -55,23 +55,35 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True)
 
+    subcategories = db.relationship('SubCategory', backref='category', lazy=True)
+
+
 class SubCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
 
+
 class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True)
 
+
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float)
-    category_id = db.Column(db.Integer)
-    subcategory_id = db.Column(db.Integer)
-    person_id = db.Column(db.Integer)
+
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('sub_category.id'))
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
+
     payment_mode = db.Column(db.String(50))
     date = db.Column(db.String(20))
+
+    # 🔥 ADD THESE RELATIONSHIPS
+    category = db.relationship('Category')
+    subcategory = db.relationship('SubCategory')
+    person = db.relationship('Person')
 
 with app.app_context():
     db.create_all()
@@ -80,6 +92,15 @@ with app.app_context():
 # =========================
 from flask import render_template, request, redirect, jsonify
 from datetime import datetime
+
+@app.route('/reset_db')
+def reset_db():
+    try:
+        db.drop_all()
+        db.create_all()
+        return "Database reset successful!"
+    except Exception as e:
+        return str(e)
 
 @app.route('/')
 def index():
