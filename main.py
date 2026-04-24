@@ -113,6 +113,27 @@ def add_category():
 
     return redirect('/')
 
+@app.route('/add_subcategory', methods=['POST'])
+def add_subcategory():
+    name = request.form['name']
+    category_id = request.form['category_id']
+
+    if name and category_id:
+        s = SubCategory(name=name, category_id=category_id)
+        db.session.add(s)
+        db.session.commit()
+
+    return redirect('/')
+@app.route('/add_person', methods=['POST'])
+def add_person():
+    name = request.form['name']
+    person_id = request.form['person_id']
+    if name:
+        p = Person(name=name, person_id=person_id)
+        db.session.add(p)
+        db.session.commit()
+    return redirect('/')
+
 # 🔥 IMPORTANT: Filter subcategories by category (AJAX endpoint)
 @app.route('/api/subcategories/<int:category_id>')
 def get_subcategories(category_id):
