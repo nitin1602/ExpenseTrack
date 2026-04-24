@@ -82,6 +82,41 @@
     <div class="col-md-8">
       <div class="card p-3">
         <h5>All Expenses</h5>
+        <form method="GET" class="row g-2 mb-3">
+
+  <!-- Category -->
+  <div class="col">
+    <select name="category_id" id="filterCategory" class="form-control">
+      <option value="">All Categories</option>
+      {% for c in categories %}
+        <option value="{{ c.id }}">{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Subcategory -->
+  <div class="col">
+    <select name="subcategory_id" id="filterSubcategory" class="form-control">
+      <option value="">All Subcategories</option>
+    </select>
+  </div>
+
+  <!-- Person -->
+  <div class="col">
+    <select name="person_id" class="form-control">
+      <option value="">All Persons</option>
+      {% for p in persons %}
+        <option value="{{ p.id }}">{{ p.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Submit -->
+  <div class="col">
+    <button class="btn btn-primary w-100">Filter</button>
+  </div>
+
+</form>
         <table class="table table-striped">
           <tr>
             <th>Date</th><th>Amount</th><th>Category</th><th>Subcategory</th><th>Person</th><th>Mode</th>
@@ -90,9 +125,9 @@
           <tr>
             <td>{{e.date}}</td>
             <td>{{e.amount}}</td>
-            <td>{{e.category}}</td>
-            <td>{{e.subcategory}}</td>
-            <td>{{e.person}}</td>
+            <td>{{ e.category.name if e.category else '' }}</td>
+            <td>{{ e.subcategory.name if e.subcategory else '' }}</td>
+            <td>{{ e.person.name if e.person else '' }}</td>
             <td>{{e.payment_mode}}</td>
           </tr>
           {% endfor %}
@@ -118,6 +153,22 @@ document.getElementById("category").addEventListener("change", function() {
                 option.value = sub.id;
                 option.text = sub.name;
                 subDropdown.appendChild(option);
+            });
+        });
+});
+</script>
+<script>
+document.getElementById("filterCategory").addEventListener("change", function() {
+    let categoryId = this.value;
+
+    fetch(`/api/subcategories/${categoryId}`)
+        .then(res => res.json())
+        .then(data => {
+            let sub = document.getElementById("filterSubcategory");
+            sub.innerHTML = '<option value="">All Subcategories</option>';
+
+            data.forEach(s => {
+                sub.innerHTML += `<option value="${s.id}">${s.name}</option>`;
             });
         });
 });

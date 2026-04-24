@@ -104,7 +104,28 @@ def reset_db():
 
 @app.route('/')
 def index():
-    expenses = Expense.query.all()
+    # expenses = Expense.query.all()
+    # categories = Category.query.all()
+    # subcategories = SubCategory.query.all()
+    # persons = Person.query.all()
+
+    category_id = request.args.get('category_id')
+    subcategory_id = request.args.get('subcategory_id')
+    person_id = request.args.get('person_id')
+
+    query = Expense.query
+
+    if category_id:
+        query = query.filter_by(category_id=category_id)
+
+    if subcategory_id:
+        query = query.filter_by(subcategory_id=subcategory_id)
+
+    if person_id:
+        query = query.filter_by(person_id=person_id)
+
+    expenses = query.all()
+
     categories = Category.query.all()
     subcategories = SubCategory.query.all()
     persons = Person.query.all()
