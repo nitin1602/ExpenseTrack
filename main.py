@@ -81,7 +81,7 @@ def index():
     subcategories = SubCategory.query.all()
     persons = Person.query.all()
 
-    return render_template('index.html',
+    return render_template('ui_expense.html',
         expenses=expenses,
         categories=categories,
         subcategories=subcategories,
