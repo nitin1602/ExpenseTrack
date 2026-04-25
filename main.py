@@ -232,16 +232,40 @@ from flask import send_file
 
 @app.route('/export/csv')
 def export_csv():
-    df = pd.read_sql_table('expense', db.engine)
+    query = db.session.query(
+        Expense.date,
+        Expense.amount,
+        Category.name.label("Category"),
+        SubCategory.name.label("Subcategory"),
+        Person.name.label("Person"),
+        Expense.payment_mode
+    ).join(Category, Expense.category_id == Category.id)\
+     .join(SubCategory, Expense.subcategory_id == SubCategory.id)\
+     .join(Person, Expense.person_id == Person.id)
+
+    df = pd.read_sql_table(query.statement, db.engine)
     file = 'expenses.csv'
     df.to_csv(file, index=False)
     return send_file(file, as_attachment=True)
 
 @app.route('/export/excel')
 def export_excel():
-    df = pd.read_sql_table('expense', db.engine)
+    query = db.session.query(
+        Expense.date,
+        Expense.amount,
+        Category.name.label("Category"),
+        SubCategory.name.label("Subcategory"),
+        Person.name.label("Person"),
+        Expense.payment_mode
+    ).join(Category, Expense.category_id == Category.id)\
+     .join(SubCategory, Expense.subcategory_id == SubCategory.id)\
+     .join(Person, Expense.person_id == Person.id)
+
+    df = pd.read_sql(query.statement, db.engine)
+
     file = 'expenses.xlsx'
     df.to_excel(file, index=False)
+
     return send_file(file, as_attachment=True)
 
 # =========================
